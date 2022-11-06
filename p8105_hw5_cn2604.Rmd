@@ -113,6 +113,42 @@ homi_data %>%
     y = "Estimate proportion",
     caption = "Data from The Washington Post")
 ```
+# Problem 3
+```{r}
+output_list_0 = vector("list", length = 100)
+for (i in 1:100) {
+  output_list_0[[i]] = rnorm(30, 0, 5)
+}
+output_test_0 = map(.x = output_list_0, ~ t.test(.x, mu=0))
+output_df_0 = 
+  tibble(
+    number = str_c("obs_0", 1:100, sep="_"),
+    result = map(output_test_0, broom::tidy)
+  ) %>% 
+  unnest(result) %>% 
+  select(number, estimate, p.value)
+
+```
+
+```{r}
+design_func = function(mean_input) {
+  output_list = vector("list", length = 5000)
+  for (i in 1:5000) {
+    output_list[[i]] = rnorm(30, mean_input, 5)
+  }
+  output_test = map(.x = output_list_0, ~ t.test(.x, mu=0))
+  output_df = 
+  tibble(
+    number = str_c("obs", mean_input, 1:5000, sep="_"),
+    result = map(output_test, broom::tidy)
+  ) %>% 
+  unnest(result) %>% 
+  select(number, estimate, p.value)
+  
+  output_df
+}
+```
+
 
 
 
