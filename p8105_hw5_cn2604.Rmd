@@ -41,7 +41,55 @@ baltimore_summary = homi_df %>%
   filter(city_state == 'Baltimore, MD') %>% 
   summarise(
     unsolved = sum(outcome == 'unsolved'),
-    n = n()
-  )
+    number = n()
+  ) %>% 
+  add_column(city_name = 'Baltimore, MD')
+
+baltimore_test = prop.test(
+  x = pull(baltimore_summary, unsolved),
+  n = pull(baltimore_summary, number)
+) 
+
+baltimore_result = baltimore_test %>% 
+  broom::tidy() %>% 
+  select(estimate, conf.low, conf.high) %>% 
+  mutate(
+    city = pull(baltimore_summary, city_name)
+  ) %>% 
+  relocate(city)
 ```
+
+```{r function_all}
+
+prop_function = function(sample_df){
+  sample_summary = sample_df %>% 
+  summarise(
+    unsolved = sum(outcome == 'unsolved'),
+    number = n()
+  )
+  
+  sample_test = 
+    prop.test(
+      x = pull(sample_summary, unsolved),
+      n = pull(sample_summary, number)
+    ) %>% 
+    broom::tidy() %>% 
+    select(estimate, conf.low, conf.high)
+  
+  sample_test
+}
+```
+
+```{r message=FALSE}
+homi_data = 
+  homi_df %>% 
+  group_by(city_state) %>% 
+  nest() %>% 
+  mutate(
+    city_result = map(data, prop_function)
+  ) %>% 
+  unnest(city_result) %>% 
+  select(-data)
+```
+
 
