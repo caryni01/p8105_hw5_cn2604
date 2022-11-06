@@ -21,7 +21,7 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 # Problem 2
-```{r load data}
+```{r load data, message=FALSE}
 homi_df = read_csv("./data/homicide-data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
@@ -36,7 +36,7 @@ homi_df = read_csv("./data/homicide-data.csv") %>%
   relocate(city_state, .after = state)
 ```
 
-The raw dataframe has `r ncol(homi_df)-2` variables for `r nrow(homi_df)` cities. It records each of homicide cases across 51 cities in the US with a label of results, which are 'Closed without arrest', 'Open/No arrest', and 'Closed by arrest'. 
+The raw dataframe has `r ncol(homi_df)-2` variables and `r nrow(homi_df)` observations. It records each of homicide cases across 51 cities in the US with a label of results, which are 'Closed without arrest', 'Open/No arrest', and 'Closed by arrest'. 
 
 Baltimore as a sample
 ```{r city_instance}
