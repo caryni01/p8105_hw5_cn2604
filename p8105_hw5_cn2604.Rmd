@@ -90,6 +90,21 @@ homi_data =
   ) %>% 
   unnest(city_result) %>% 
   select(-data)
+
+homi_data %>% 
+  head() %>% 
+  knitr::kable()
 ```
+
+```{r plot}
+
+homi_data %>% 
+  filter(city_state != "Tulsa, AL") %>% 
+  ggplot(aes(x = reorder(city_state,-estimate), y = estimate)) + 
+  geom_bar(stat="identity") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
 
 
