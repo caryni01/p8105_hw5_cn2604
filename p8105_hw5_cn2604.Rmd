@@ -115,39 +115,101 @@ homi_data %>%
 ```
 # Problem 3
 ```{r}
-output_list_0 = vector("list", length = 100)
-for (i in 1:100) {
+output_list_0 = vector("list", length = 5000)
+for (i in 1:5000) {
   output_list_0[[i]] = rnorm(30, 0, 5)
 }
 output_test_0 = map(.x = output_list_0, ~ t.test(.x, mu=0))
 output_df_0 = 
   tibble(
-    number = str_c("obs_0", 1:100, sep="_"),
+    true_mean = "0",
     result = map(output_test_0, broom::tidy)
   ) %>% 
   unnest(result) %>% 
-  select(number, estimate, p.value)
+  select(true_mean, estimate, p.value)
 
 ```
 
-```{r}
+```{r create_function}
 design_func = function(mean_input) {
   output_list = vector("list", length = 5000)
   for (i in 1:5000) {
     output_list[[i]] = rnorm(30, mean_input, 5)
   }
-  output_test = map(.x = output_list_0, ~ t.test(.x, mu=0))
+  output_test = map(.x = output_list, ~ t.test(.x, mu=0))
   output_df = 
   tibble(
-    number = str_c("obs", mean_input, 1:5000, sep="_"),
+    true_mean = as.character(mean_input),
     result = map(output_test, broom::tidy)
   ) %>% 
   unnest(result) %>% 
-  select(number, estimate, p.value)
+  select(true_mean, estimate, p.value)
   
   output_df
 }
 ```
+
+```{r}
+test_mean = c(1, 2, 3, 4, 5, 6)
+result_df = map_dfr(test_mean, design_func)
+```
+
+```{r}
+result_summary = 
+  result_df %>% 
+  group_by(true_mean) %>% 
+  summarise(
+    ave_estimate = mean(estimate), 
+    prop_reject = sum(p.value < 0.05)/n()
+  ) %>% 
+  mutate(true_mean = as.numeric(true_mean)) 
+```
+
+```{r plot, warning=FALSE}
+result_summary %>% 
+  ggplot(aes(x=true_mean, y=prop_reject)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    x = "True mean",
+    y = "Proportion of null rejection"
+    )
+```
+
+As the effect sizes increase, the statistical power will also increase. 
+
+
+```{r}
+
+result_summary %>% 
+  ggplot(aes(x=true_mean, y=ave_estimate)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    x = "True mean",
+    y = "Average estimate mean"
+    )
+
+```
+
+```{r}
+result_df %>% 
+  filter(p.value < 0.05) %>% 
+  group_by(true_mean) %>% 
+  summarise(
+    ave_estimate = mean(estimate)
+  ) %>% 
+  mutate(true_mean = as.numeric(true_mean)) %>% 
+  ggplot(aes(x=true_mean, y=ave_estimate)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    x = "True mean",
+    y = "Average estimate mean for null rejected"
+    )
+```
+
+
 
 
 
