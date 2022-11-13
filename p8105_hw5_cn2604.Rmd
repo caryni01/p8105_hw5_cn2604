@@ -20,7 +20,9 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
+
 # Problem 2
+
 ```{r load data, message=FALSE}
 homi_df = read_csv("./data/homicide-data.csv") %>% 
   janitor::clean_names() %>% 
@@ -98,8 +100,8 @@ homi_data %>%
   head() %>% 
   knitr::kable()
 ```
-
-```{r plot}
+Create plots
+```{r whole_plot}
 
 homi_data %>% 
   filter(city_state != "Tulsa, AL") %>% 
@@ -113,7 +115,9 @@ homi_data %>%
     y = "Estimate proportion",
     caption = "Data from The Washington Post")
 ```
+
 # Problem 3
+
 ```{r}
 output_list_0 = vector("list", length = 5000)
 for (i in 1:5000) {
@@ -179,7 +183,7 @@ result_summary %>%
 As the effect sizes increase, the statistical power will also increase. 
 
 
-```{r}
+```{r message=FALSE}
 
 result_summary %>% 
   ggplot(aes(x=true_mean, y=ave_estimate)) +
@@ -192,7 +196,7 @@ result_summary %>%
 
 ```
 
-```{r}
+```{r message=FALSE}
 result_df %>% 
   filter(p.value < 0.05) %>% 
   group_by(true_mean) %>% 
@@ -209,7 +213,7 @@ result_df %>%
     )
 ```
 
-
+For the sample with true mean μ = 1, 2, 3, the sample average of μ hat across tests for which the null is rejected are higher than their true means since the μ closer to μ=0 are excluded from the calculation for failure of rejection. For true mean μ = 4, 5, 6, the sample average of μ hat across tests for which the null is rejected are approximately equal to their true means because there is few sample closer to μ=0 are excluded from the calculation since the probability to failure of rejection is too low for μ = 4, 5, 6. 
 
 
 
